@@ -1,8 +1,17 @@
 package com.vleal.sbctoq;
 
+import java.util.ArrayList;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import android.app.ActionBar;
 import android.app.Activity;
 import android.os.Bundle;
+import android.util.Log;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
 
 
 public class AssetActivity extends Activity {
@@ -13,62 +22,54 @@ public class AssetActivity extends Activity {
 		final ActionBar actionBar = getActionBar();
 		actionBar.setHomeButtonEnabled(true);
 		actionBar.setDisplayHomeAsUpEnabled(true);
-		//overridePendingTransition(R.anim.activity_open_translate, R.anim.activity_close_scale);
 		
 		setContentView(R.layout.activity_asset);
 		
 		Bundle intent     = getIntent().getExtras();
-		//String JsonString = intent.getString("json");
+		String jsonString = intent.getString("json");
 		String name       = intent.getString("name");
 		
-		//Set the new Title
 		actionBar.setTitle(name);
 		
-		/*try {
-			JSONObject json      = new JSONObject(string);
-			JSONObject balance   = json.getJSONObject("balance");
-			JSONArray scheduling = json.getJSONArray("scheduling");
-			String token         = json.getString("token");
-
-			String value         = balance.getString("value");
-			String number        = balance.getString("number");
-			String date          = balance.getString("date");
-			ListView list        = (ListView) findViewById(R.id.list);
+		try {
+			JSONObject json      = new JSONObject(jsonString);
+			JSONObject data      = json.getJSONObject("data");
+			JSONArray sensorData = data.getJSONArray("sensorData");
 			
-			TextView cardNumber  = (TextView)    findViewById(R.id.cardNumber);
-			TextView money       = (TextView)    findViewById(R.id.money);
-			ProgressBar loader   = (ProgressBar) findViewById(R.id.loader_list);
+			ArrayList<String> assets = null;
 			
-			cardNumber.setText("Cart‹o: "+ CardFormat.string(number));
-			money.setText("R$ "+ value);
-			
-			if (scheduling != null && scheduling.length() > 0) {
-				JSONObject schedualJson = (JSONObject) scheduling.get(0);
-				String schedualDate     = (String) schedualJson.get("date");
-				String schedualdesc     = (String) schedualJson.get("description");
-				String schedualValue    = (String) schedualJson.get("value");
+			if (sensorData != null && sensorData.length() > 0) {
+				assets = new ArrayList<String>();
 				
-				FrameLayout greenBox    = (FrameLayout) findViewById(R.id.greenBox);
-				View greenLine          = (View)        findViewById(R.id.greenLine);
-				TextView nextDeposit    = (TextView)    findViewById(R.id.nextDeposit);
-				TextView descDesdposit  = (TextView)    findViewById(R.id.descDeposit);
-				TextView valueDesposit  = (TextView)    findViewById(R.id.valueDeposit);
+				for(int i = 0; i < sensorData.length(); i++) {
+					JSONObject assetItem = sensorData.getJSONObject(i);
+			   		JSONObject asset     = assetItem.getJSONObject("ms");
+			   		int v                = asset.getInt("v");
+			   		String p             = asset.getString("p");
+			   		String u             = asset.getString("u");
+			   		
+			   		if (u == "Unknown") {
+			   			u = null;
+			   		}
+			   		
+			   		assets.add(p + ": " + v +" " + u);
+			  	}
 				
-				nextDeposit.setText("Pr—ximo dep—sito: "+ schedualDate);
-				descDesdposit.setText(schedualdesc);
-				valueDesposit.setText("R$ "+ schedualValue);
-				greenBox.setVisibility(View.VISIBLE);
-				greenLine.setVisibility(View.VISIBLE);
+			} else {
+				assets = new ArrayList<String>();
+				assets.add("Nenhum dado enviado para o SBC");
 			}
 			
-			CheckCard checkCard = new CheckCard(this);
-			checkCard.list(list, loader, number, token);
+			ArrayAdapter<String> adapter = new ArrayAdapter<String>(getApplicationContext(), 
+					R.layout.sensor_list_item, R.id.sensorName, assets);
 			
-			setTitle(getString(R.string.your_balance) + " - " + date);
+			ListView list = (ListView) findViewById(R.id.sensorList);
+			list.setAdapter(adapter);
+
 			
-		} catch (JSONException e1) {
-			e1.printStackTrace();
-		}*/
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
 	}
 }
 

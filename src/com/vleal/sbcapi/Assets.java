@@ -45,7 +45,6 @@ public class Assets {
 				try {
 					if (json.has("data")) {
 						JSONArray assetsList = (JSONArray) json.get("data");
-						Log.e("Assets", assetsList.toString());
 						
 						if (assetsList != null && assetsList.length() > 0) {
 							for(int i = 0; i < assetsList.length(); i++) {
@@ -56,16 +55,8 @@ public class Assets {
 						   		String name          = asset.getString("name");
 						   		int number           = i + 1;
 						   		
-						   		SimpleTextCard assetCard = null;
-						   		
-						   		if (update == true) {
-						   			assetCard = (SimpleTextCard) listCard.childAtIndex(i);
-						   			Log.e("update", assetCard.toString());
-						   		} else {
-						   			assetCard = new SimpleTextCard("asset"+ number, "Asset "+ number, System.currentTimeMillis(), name, null);
-						   		}
+						   		SimpleTextCard assetCard = new SimpleTextCard("asset"+ number, "Asset "+ number, System.currentTimeMillis(), name, null);
 						   		assetCard.setReceivingEvents(true);
-						        //assetCard.setMenuOptions(new String[]{"aaa", "bbb", "ccc"});
 						   		assetCard.setShowDivider(false);
 						        listCard.add(assetCard);
 						  	}
@@ -115,7 +106,7 @@ public class Assets {
 									
 									try {
 										Assets one = new Assets(getContext());
-										one.getAsset(asset);
+										one.makeAsset(asset);
 										
 									} catch (JSONException e) {}
 								}
@@ -133,7 +124,7 @@ public class Assets {
 	}
 	
 	//Get asset
-	public void getAsset(final String asset) throws JSONException {
+	public void makeAsset(final String asset) throws JSONException {
 		SbcAPI.get(asset, null, new JsonHttpResponseHandler() {
 			@Override
 			public void onSuccess(JSONObject json) {
