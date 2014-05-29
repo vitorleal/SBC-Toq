@@ -18,6 +18,8 @@ import android.widget.ListView;
 import android.widget.ProgressBar;
 
 import com.loopj.android.http.JsonHttpResponseHandler;
+import com.qualcomm.toq.smartwatch.api.v1.deckofcards.card.ListCard;
+import com.qualcomm.toq.smartwatch.api.v1.deckofcards.card.SimpleTextCard;
 import com.vleal.sbctoq.AssetActivity;
 import com.vleal.sbctoq.R;
 
@@ -36,8 +38,40 @@ public class Assets {
 		Assets.context = context;
 	}
 	
+	public void makeCardList(final ListCard listCard) throws JSONException {
+		SbcAPI.get(null, null, new JsonHttpResponseHandler() {
+			@Override
+			public void onSuccess(JSONObject json) {
+				try {
+					if (json.has("data")) {
+						JSONArray assetsList = (JSONArray) json.get("data");
+						Log.e("Assets", assetsList.toString());
+						
+						if (assetsList != null && assetsList.length() > 0) {
+							for(int i = 0; i < assetsList.length(); i++) {
+								Log.e("Assets", "card" + i);
+								
+								JSONObject assetItem = assetsList.getJSONObject(i);
+						   		JSONObject asset     = assetItem.getJSONObject("asset");
+						   		String name          = asset.getString("name");
+						   		
+						   		SimpleTextCard simpleTextCard = new SimpleTextCard("asset"+ i, name, System.currentTimeMillis(), null, null);
+						        simpleTextCard.setInfoText("10");
+						        simpleTextCard.setReceivingEvents(true);
+						        //simpleTextCard.setMenuOptions(new String[]{"aaa", "bbb", "ccc"});
+						        simpleTextCard.setShowDivider(true);
+						        listCard.add(simpleTextCard);
+						  	}
+						}
+					}
+					
+				} catch (Exception e) {} 	
+			}
+		});
+	}
+	
 	//Get asset list
-	public void getList(final ListView list, final ProgressBar loader) throws JSONException {
+	public void makeList(final ListView list, final ProgressBar loader) throws JSONException {
 		SbcAPI.get(null, null, new JsonHttpResponseHandler() {
 			
 			@Override

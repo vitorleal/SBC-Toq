@@ -18,7 +18,7 @@ public class AssetActivity extends Activity {
 		setContentView(R.layout.activity_asset);
 		
 		Bundle intent     = getIntent().getExtras();
-		String JsonString = intent.getString("json");
+		//String JsonString = intent.getString("json");
 		String name       = intent.getString("name");
 		
 		//Set the new Title

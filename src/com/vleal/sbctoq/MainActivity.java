@@ -4,6 +4,7 @@ import org.json.JSONException;
 
 import android.app.Activity;
 import android.app.Fragment;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -37,11 +38,16 @@ public class MainActivity extends Activity {
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
-		int id = item.getItemId();
-		if (id == R.id.action_settings) {
-			return true;
+		switch (item.getItemId()) {
+			case R.id.action_settings:
+				Intent intent = new Intent(this, ToqActivity.class);
+				startActivityForResult(intent, 0);
+				
+				return true;
+
+			default:
+				return super.onOptionsItemSelected(item);
 		}
-		return super.onOptionsItemSelected(item);
 	}
 
 	public static class PlaceholderFragment extends Fragment {
@@ -60,11 +66,9 @@ public class MainActivity extends Activity {
 			try {
 				//Get assets list
 				Assets assets = new Assets(rootView.getContext());
-				assets.getList(assetsList, loader);
+				assets.makeList(assetsList, loader);
 				
-			} catch (JSONException e) {
-				e.printStackTrace();
-			}
+			} catch (JSONException e) {}
 			
 			return rootView;
 		}

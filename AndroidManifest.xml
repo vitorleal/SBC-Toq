@@ -25,12 +25,29 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        
         <activity
             android:name="com.vleal.sbctoq.AssetActivity"
             android:label="@string/app_name"
             android:screenOrientation="portrait"
             android:parentActivityName="com.vleal.sbctoq.MainActivity" >
         </activity>
+        
+        <activity
+            android:name="com.vleal.sbctoq.ToqActivity"
+            android:label="@string/app_name"
+            android:screenOrientation="portrait"
+            android:parentActivityName="com.vleal.sbctoq.MainActivity" >
+        </activity>
+        
+        <receiver 
+            android:name=".ToqAppletInstallationBroadcastReceiver"
+            android:enabled="true"
+            android:exported="true">            
+            <intent-filter>
+                <action android:name="com.qualcomm.toq.smartwatch.install.applet" />
+            </intent-filter>
+        </receiver>
     </application>
 
 </manifest>
