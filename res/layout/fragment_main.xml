@@ -7,7 +7,7 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context="com.vleal.sbctoq.MainActivity$PlaceholderFragment" >
+    tools:context="com.vleal.sbc.MainActivity$PlaceholderFragment" >
     
     <ListView
         android:id="@+id/assetsList"
