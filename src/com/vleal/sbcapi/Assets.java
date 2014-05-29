@@ -54,12 +54,13 @@ public class Assets {
 								JSONObject assetItem = assetsList.getJSONObject(i);
 						   		JSONObject asset     = assetItem.getJSONObject("asset");
 						   		String name          = asset.getString("name");
-						   		
-						   		SimpleTextCard simpleTextCard = new SimpleTextCard("asset"+ i, name, System.currentTimeMillis(), null, null);
-						        simpleTextCard.setInfoText("10");
+						   		int number           = i + 1;
+	   		
+						   		SimpleTextCard simpleTextCard = new SimpleTextCard("asset"+ number, "Asset "+ number, System.currentTimeMillis(), name, null);
+						        simpleTextCard .setInfoText("10");
 						        simpleTextCard.setReceivingEvents(true);
 						        //simpleTextCard.setMenuOptions(new String[]{"aaa", "bbb", "ccc"});
-						        simpleTextCard.setShowDivider(true);
+						        simpleTextCard.setShowDivider(false);
 						        listCard.add(simpleTextCard);
 						  	}
 						}
