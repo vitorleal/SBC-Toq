@@ -9,7 +9,6 @@ import org.json.JSONObject;
 import android.app.ActionBar;
 import android.app.Activity;
 import android.os.Bundle;
-import android.util.Log;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
@@ -22,6 +21,8 @@ public class AssetActivity extends Activity {
 		final ActionBar actionBar = getActionBar();
 		actionBar.setHomeButtonEnabled(true);
 		actionBar.setDisplayHomeAsUpEnabled(true);
+		
+		overridePendingTransition(R.anim.activity_open_translate, R.anim.activity_close_scale);
 		
 		setContentView(R.layout.activity_asset);
 		
@@ -57,7 +58,7 @@ public class AssetActivity extends Activity {
 				
 			} else {
 				assets = new ArrayList<String>();
-				assets.add("Nenhum dado enviado para o SBC");
+				assets.add(getString(R.string.no_asset_data));
 			}
 			
 			ArrayAdapter<String> adapter = new ArrayAdapter<String>(getApplicationContext(), 

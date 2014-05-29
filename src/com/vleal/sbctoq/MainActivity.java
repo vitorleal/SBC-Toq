@@ -22,6 +22,8 @@ public class MainActivity extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
+		
+		overridePendingTransition(R.anim.activity_open_scale, R.anim.activity_close_translate);
 
 		if (savedInstanceState == null) {
 			getFragmentManager().beginTransaction()

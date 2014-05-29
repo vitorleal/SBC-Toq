@@ -13,8 +13,25 @@
         android:id="@+id/sensorList"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_below="@+id/deviceListTitle"
         android:layout_centerHorizontal="true" >
 
     </ListView>
+    
+    <TextView
+        android:id="@+id/deviceListTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:gravity="center"
+        android:layout_margin="0dip"
+        android:paddingBottom="10dip"
+        android:paddingLeft="0dip"
+        android:paddingRight="0dip"
+        android:paddingTop="3dip"
+        android:text="@string/sensor_list"
+        android:textAppearance="@style/AppBaseTheme"
+        android:textSize="30sp" />
 
 </RelativeLayout>

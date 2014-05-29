@@ -8,14 +8,13 @@
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="com.vleal.sbctoq.MainActivity$PlaceholderFragment" >
-
+    
     <ListView
         android:id="@+id/assetsList"
-        
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/deviceListTitle"
         android:layout_centerHorizontal="true" >
-
     </ListView>
 
     <ProgressBar
@@ -25,5 +24,21 @@
         android:layout_height="fill_parent"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true" />
+
+    <TextView
+        android:id="@+id/deviceListTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:gravity="center"
+        android:layout_margin="0dip"
+        android:paddingBottom="10dip"
+        android:paddingLeft="0dip"
+        android:paddingRight="0dip"
+        android:paddingTop="3dip"
+        android:text="@string/asset_list"
+        android:textAppearance="@style/AppBaseTheme"
+        android:textSize="30sp" />
 
 </RelativeLayout>

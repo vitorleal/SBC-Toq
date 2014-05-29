@@ -1,10 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">SBC</string>
-    <string name="action_settings">Settings</string>
-    <string name="no_asset_data">This device dont have any data yet!</string>
-    <string name="no_asset">Your service dont have any device yet!</string>
-    <string name="loading">Loading</string>
+    <string name="action_settings">Configuração</string>
+    <string name="no_asset_data">Nenhum dado no SBC</string>
+    <string name="no_asset">Você ainda não tem nenhum asset conectado na SBC</string>
+    <string name="loading">Carregando</string>
+    <string name="asset_list">Lista de devices</string>
+    <string name="sensor_list">Lista de sensores</string>
     
     <string name="doc_install_button">Instalar</string>
     <string name="doc_update_button">Atualizar</string>

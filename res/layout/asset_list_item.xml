@@ -15,6 +15,6 @@
 	    android:paddingTop="3dip"
 	    android:text=""
 	    android:textAppearance="@style/AppBaseTheme"
-	    android:textSize="26sp" />
+	    android:textSize="24sp" />
 
 </LinearLayout>
