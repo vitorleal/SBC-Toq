@@ -41,7 +41,7 @@
         </activity>
         
         <receiver 
-            android:name=".ToqAppletInstallationBroadcastReceiver"
+            android:name=".ToqAppletInstallBroadcastReciever"
             android:enabled="true"
             android:exported="true">            
             <intent-filter>

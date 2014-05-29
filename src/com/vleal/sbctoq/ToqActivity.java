@@ -17,7 +17,6 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -34,50 +33,40 @@ import com.qualcomm.toq.smartwatch.api.v1.deckofcards.resource.DeckOfCardsLaunch
 import com.qualcomm.toq.smartwatch.api.v1.deckofcards.util.ParcelableUtil;
 import com.vleal.sbcapi.Assets;
 
+
 public class ToqActivity extends Activity {
-	
-	private final static String SBC_PREFS_FILE= "sbc_prefs_file";
-    private final static String DECK_OF_CARDS_KEY= "deck_of_cards_key";
-    private final static String DECK_OF_CARDS_VERSION_KEY= "deck_of_cards_version_key";
+	private final static String SBC_PREFS_FILE            = "sbc_prefs_file";
+    private final static String DECK_OF_CARDS_KEY         = "deck_of_cards_key";
+    private final static String DECK_OF_CARDS_VERSION_KEY = "deck_of_cards_version_key";
     
     private DeckOfCardsManager deckOfCardsManager;
         
     private DeckOfCardsManagerListener deckOfCardsManagerListener;
     private DeckOfCardsEventListener deckOfCardsEventListener;
     
-    private ToqAppStateBroadcastReceiver toqAppStateReceiver;
+    private ToqAppletInstallBroadcastReciever toqAppStateReceiver;
     private RemoteResourceStore resourceStore;   
     private RemoteDeckOfCards deckOfCards;
-        
-    private ViewGroup deckOfCardsPanel;
+
     private Button installDeckOfCardsButton;
     private Button updateDeckOfCardsButton;
     private Button uninstallDeckOfCardsButton;
     
-    private ViewGroup notificationPanel;
     private Button sendNotificationButton;
     private TextView statusTextView;
-
     
 	//On Create the activity
-	public void onCreate(Bundle icicle) {
-        
+	public void onCreate(Bundle icicle) { 
         super.onCreate(icicle);
-        
-        Log.d(Constants.TAG, "ToqApiDemo.onCreate");
 
         setContentView(R.layout.activity_toq);
         
-        // Get the reference to the deck of cards manager
-        deckOfCardsManager= DeckOfCardsManager.getInstance(getApplicationContext());
-
-        // Create listeners
+        deckOfCardsManager         = DeckOfCardsManager.getInstance(getApplicationContext());
         deckOfCardsManagerListener = new DeckOfCardsManagerListenerImpl();
         deckOfCardsEventListener   = new DeckOfCardsEventListenerImpl();
-        // Create the state receiver
-        toqAppStateReceiver        = new ToqAppStateBroadcastReceiver();
+        toqAppStateReceiver        = new ToqAppletInstallBroadcastReciever();
         
-        initDeckOfCards();       
+        initDeckOfCards();
         initUI();
     }
     
@@ -212,9 +201,6 @@ public class ToqActivity extends Activity {
             });
         }
 
-        /**
-         * @see com.qualcomm.toq.smartwatch.api.v1.deckofcards.DeckOfCardsEventListener#onCardInvisible(java.lang.String)
-         */
         public void onCardInvisible(final String cardId) {
             runOnUiThread(new Runnable() {
                 public void run() {
@@ -223,9 +209,6 @@ public class ToqActivity extends Activity {
             });
         }
 
-        /**
-         * @see com.qualcomm.toq.smartwatch.api.v1.deckofcards.DeckOfCardsEventListener#onCardClosed(java.lang.String)
-         */
         public void onCardClosed(final String cardId) {
             runOnUiThread(new Runnable() {
                 public void run() {
@@ -234,9 +217,6 @@ public class ToqActivity extends Activity {
             });
         }
 
-        /**
-         * @see com.qualcomm.toq.smartwatch.api.v1.deckofcards.DeckOfCardsEventListener#onMenuOptionSelected(java.lang.String, java.lang.String)
-         */
         public void onMenuOptionSelected(final String cardId, final String menuOption) {
             runOnUiThread(new Runnable() {
                 public void run() {
@@ -246,13 +226,11 @@ public class ToqActivity extends Activity {
         }
 
     }
-    
-    
+        
     // Toq app state receiver
-    private class ToqAppStateBroadcastReceiver extends BroadcastReceiver {
+    private class ToqAppletInstallBroadcastReciever extends BroadcastReceiver {
 
         public void onReceive(Context context, Intent intent) {
-
             String action= intent.getAction();
 
             if (action == null) {
@@ -321,7 +299,6 @@ public class ToqActivity extends Activity {
     
     // Set up UI for when deck of cards applet is already installed
     private void updateUIInstalled() {
-        
         // Enable everything
         //setChildrenEnabled(deckOfCardsPanel, true);
         //setChildrenEnabled(notificationPanel, true);
@@ -337,18 +314,11 @@ public class ToqActivity extends Activity {
     
     
     // Set up UI for when deck of cards applet is not installed
-    private void updateUINotInstalled() {
-        // Disable notification panel
-        //setChildrenEnabled(notificationPanel, false);
-
-        // Enable deck of cards panel
-        //setChildrenEnabled(deckOfCardsPanel, true);
-        
+    private void updateUINotInstalled() {        
         // Install enabled; update, uninstall disabled
         installDeckOfCardsButton.setEnabled(true);
         updateDeckOfCardsButton.setEnabled(false);
         uninstallDeckOfCardsButton.setEnabled(false);
-        
         // Focus
         installDeckOfCardsButton.requestFocus();
     }
@@ -381,15 +351,10 @@ public class ToqActivity extends Activity {
     
     // Initialise deck of cards
     private void initDeckOfCards() {    
-        // Try to retrieve a stored deck of cards
-        try{
-            
-            // If there is no stored deck of cards or it is unusable, then create new and store
-            if ((deckOfCards = getStoredDeckOfCards()) == null) {               
-                deckOfCards = createDeckOfCards();
-                storeDeckOfCards();                
-            }
-            
+        try {                   
+          deckOfCards = createDeckOfCards();
+          storeDeckOfCards();                
+   
         } catch (Throwable th) {
             Log.w(Constants.TAG, "ToqApiDemo.initDeckOfCards - error occurred retrieving the stored deck of cards: " + th.getMessage());
             deckOfCards = null; // Reset to force recreate
@@ -415,27 +380,6 @@ public class ToqActivity extends Activity {
             Log.e(Constants.TAG, "ToqApiDemo.initDeckOfCards - error occurred parsing the icons", e);
         }
     }
-
-    
-    // Get stored deck of cards if one exists
-    private RemoteDeckOfCards getStoredDeckOfCards() throws Exception {
-        
-        if (!isValidDeckOfCards()) {
-            Log.w(Constants.TAG, "ToqApiDemo.getStoredDeckOfCards - stored deck of cards not valid for this version of the demo, recreating...");
-            return null;
-        }
-        
-        SharedPreferences prefs = getSharedPreferences(SBC_PREFS_FILE, Context.MODE_PRIVATE);
-        String deckOfCardsStr   = prefs.getString(DECK_OF_CARDS_KEY, null);
-        
-        if (deckOfCardsStr == null) {
-            return null;
-            
-        } else {
-            return ParcelableUtil.unmarshall(deckOfCardsStr, RemoteDeckOfCards.CREATOR);
-        }
-        
-    }
     
     // Store deck of cards
     private void storeDeckOfCards() throws Exception {        
@@ -446,20 +390,6 @@ public class ToqActivity extends Activity {
         editor.putInt(DECK_OF_CARDS_VERSION_KEY, Constants.VERSION_CODE);
         editor.commit();       
     }
-    
-    // Check if the stored deck of cards is valid for this version of the demo
-    private boolean isValidDeckOfCards() {
-        
-        SharedPreferences prefs = getSharedPreferences(SBC_PREFS_FILE, Context.MODE_PRIVATE);
-        int deckOfCardsVersion  = prefs.getInt(DECK_OF_CARDS_VERSION_KEY, 0);
-
-        if (deckOfCardsVersion < Constants.VERSION_CODE) {
-            return false;
-        }
-        
-        return true;
-    }
-    
     
     // Create some cards with example content
     private RemoteDeckOfCards createDeckOfCards() {
@@ -540,8 +470,8 @@ public class ToqActivity extends Activity {
         
         try{
             storeDeckOfCards();
-        }
-        catch (Exception e){
+            
+        } catch (Exception e){
             Log.e(Constants.TAG, "ToqApiDemo.installDeckOfCards - error storing deck of cards applet", e);
         }
 
@@ -549,24 +479,23 @@ public class ToqActivity extends Activity {
     
     
     // Update deck of cards applet
-    private void updateDeckOfCards(){
-        
+    private void updateDeckOfCards() {
         Log.d(Constants.TAG, "ToqApiDemo.updateDeckOfCards");
         
         updateDeckOfCardsFromUI();
         
-        try{            
+        try {            
             deckOfCardsManager.updateDeckOfCards(deckOfCards, resourceStore);
             
-        } catch (RemoteDeckOfCardsException e){
+        } catch (RemoteDeckOfCardsException e) {
             Toast.makeText(this, getString(R.string.error_updating_deck_of_cards), Toast.LENGTH_SHORT).show();
             Log.e(Constants.TAG, "ToqApiDemo.updateDeckOfCards - error updating deck of cards applet", e);
         }
         
-        try{
+        try {
             storeDeckOfCards();
             
-        } catch (Exception e){
+        } catch (Exception e) {
             Log.e(Constants.TAG, "ToqApiDemo.updateDeckOfCards - error storing deck of cards applet", e);
         }
 
@@ -574,14 +503,14 @@ public class ToqActivity extends Activity {
     
     
     // Uninstall deck of cards applet
-    private void uninstallDeckOfCards(){
+    private void uninstallDeckOfCards() {
         
         Log.d(Constants.TAG, "ToqApiDemo.uninstallDeckOfCards");
         
-        try{                        
+        try {                        
             deckOfCardsManager.uninstallDeckOfCards();
-        }
-        catch (RemoteDeckOfCardsException e){
+            
+        } catch (RemoteDeckOfCardsException e) {
             Toast.makeText(this, getString(R.string.error_uninstalling_deck_of_cards), Toast.LENGTH_SHORT).show();
             Log.e(Constants.TAG, "ToqApiDemo.uninstallDeckOfCards - error uninstalling deck of cards applet applet", e);
         }
@@ -590,7 +519,7 @@ public class ToqActivity extends Activity {
     
     
     // Send notification button
-    private void sendNotification(){
+    private void sendNotification() {
         Log.d(Constants.TAG, "ToqApiDemo.sendNotification");
       
         // Create notification text card from UI values
@@ -615,25 +544,6 @@ public class ToqActivity extends Activity {
         }      
 		*/
     }
- 
-    // Enable/Disable a view group's children and nested children
-    private void setChildrenEnabled(ViewGroup viewGroup, boolean isEnabled){
-
-        for (int i = 0; i < viewGroup.getChildCount();  i++){
-
-            View view= viewGroup.getChildAt(i);
-
-            if (view instanceof ViewGroup){
-                setChildrenEnabled((ViewGroup)view, isEnabled);
-            }
-            else{
-                view.setEnabled(isEnabled);
-            }
-
-        }       
-        
-    }
-  
   
     // Read an icon from assets and return as a bitmap
     private Bitmap getIcon(String fileName) throws Exception {
@@ -652,77 +562,11 @@ public class ToqActivity extends Activity {
     // Parse the UI to update the deck of cards contents
     private void updateDeckOfCardsFromUI() {
         ListCard listCard = deckOfCards.getListCard();
-
-        /* // Card 1
-        SimpleTextCard simpleTextCard= (SimpleTextCard)listCard.childAtIndex(0);        
-        simpleTextCard.setHeaderText(((EditText)findViewById(R.id.doc1_header_text)).getText().toString());
-        simpleTextCard.setTitleText(((EditText)findViewById(R.id.doc1_title_text)).getText().toString());
-        simpleTextCard.setMessageText(splitString(((EditText)findViewById(R.id.doc1_message_text)).getText().toString()));
-        simpleTextCard.setInfoText(((EditText)findViewById(R.id.doc1_info_text)).getText().toString());
-        simpleTextCard.setReceivingEvents(((CheckBox)findViewById(R.id.doc1_events_checkbox)).isChecked());
-        simpleTextCard.setShowDivider(((CheckBox)findViewById(R.id.doc1_divider_checkbox)).isChecked());
-        simpleTextCard.setTimeMillis(System.currentTimeMillis());
         
-        if (((EditText)findViewById(R.id.doc1_menu_options_text)).getText().length() == 0) {
-            simpleTextCard.setMenuOptions(null); // If all menu options deleted, reset
-            
-        } else {
-            simpleTextCard.setMenuOptions(splitString(((EditText)findViewById(R.id.doc1_menu_options_text)).getText().toString()));
-        }     
-                
-        // Card 2
-        simpleTextCard= (SimpleTextCard)listCard.childAtIndex(1);        
-        simpleTextCard.setHeaderText(((EditText)findViewById(R.id.doc2_header_text)).getText().toString());
-        simpleTextCard.setTitleText(((EditText)findViewById(R.id.doc2_title_text)).getText().toString());
-        simpleTextCard.setMessageText(splitString(((EditText)findViewById(R.id.doc2_message_text)).getText().toString()));
-        simpleTextCard.setInfoText(((EditText)findViewById(R.id.doc2_info_text)).getText().toString());
-        simpleTextCard.setReceivingEvents(((CheckBox)findViewById(R.id.doc2_events_checkbox)).isChecked());
-        simpleTextCard.setShowDivider(((CheckBox)findViewById(R.id.doc2_divider_checkbox)).isChecked());
-        simpleTextCard.setTimeMillis(System.currentTimeMillis());
-        
-        if (((EditText)findViewById(R.id.doc2_menu_options_text)).getText().length() == 0) {
-            simpleTextCard.setMenuOptions(null); // If all menu options deleted, reset
-            
-        } else {
-            simpleTextCard.setMenuOptions(splitString(((EditText)findViewById(R.id.doc2_menu_options_text)).getText().toString()));
-        }
-        
-        // Card 3
-        simpleTextCard= (SimpleTextCard)listCard.childAtIndex(2);        
-        simpleTextCard.setHeaderText(((EditText)findViewById(R.id.doc3_header_text)).getText().toString());
-        simpleTextCard.setTitleText(((EditText)findViewById(R.id.doc3_title_text)).getText().toString());
-        simpleTextCard.setMessageText(splitString(((EditText)findViewById(R.id.doc3_message_text)).getText().toString()));
-        simpleTextCard.setInfoText(((EditText)findViewById(R.id.doc3_info_text)).getText().toString());
-        simpleTextCard.setReceivingEvents(((CheckBox)findViewById(R.id.doc3_events_checkbox)).isChecked());
-        simpleTextCard.setShowDivider(((CheckBox)findViewById(R.id.doc3_divider_checkbox)).isChecked());
-        simpleTextCard.setTimeMillis(System.currentTimeMillis());
-        
-        if (((EditText)findViewById(R.id.doc3_menu_options_text)).getText().length() == 0) {
-            simpleTextCard.setMenuOptions(null); // If all menu options deleted, reset
-            
-        } else {
-            simpleTextCard.setMenuOptions(splitString(((EditText)findViewById(R.id.doc3_menu_options_text)).getText().toString()));
-        } 
-		*/
-    }
-    
-    
-    private String concatStrings(String[] textStrs) {
-        StringBuilder buffy= new StringBuilder();
-        
-        for (int i= 0; i < textStrs.length; i++) {
-            
-            buffy.append(textStrs[i]);
-            
-            if (i < (textStrs.length - 1)) {
-                buffy.append("\n");
-            }
-        }
-        
-        return buffy.toString();        
-    }
-    
-    private String[] splitString(String textStr) {       
-        return textStr.split("\n");
+        try {
+        	Assets assets = new Assets(ToqActivity.this);
+			assets.makeCardList(listCard);
+			
+		} catch (JSONException e) {}
     }
 }
