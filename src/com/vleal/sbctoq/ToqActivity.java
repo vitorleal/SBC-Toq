@@ -72,10 +72,7 @@ public class ToqActivity extends Activity {
     
 
     protected void onStart() {
-
-        super.onStart();
-        
-		Log.d(Constants.TAG, "ToqApiDemo.onStart");        
+        super.onStart();    
         
         // Add the listeners
         deckOfCardsManager.addDeckOfCardsManagerListener(deckOfCardsManagerListener);
@@ -85,20 +82,17 @@ public class ToqActivity extends Activity {
 
         // If not connected, try to connect
         if (!deckOfCardsManager.isConnected()) {
-            setStatus(getString(R.string.status_connecting));
-            
-            Log.d(Constants.TAG, "ToqApiDemo.onStart - not connected, connecting...");   
+            setStatus(getString(R.string.status_connecting));  
 
-            try{
+            try {
                 deckOfCardsManager.connect();
                 
             } catch (RemoteDeckOfCardsException e) {
                 Toast.makeText(this, getString(R.string.error_connecting_to_service), Toast.LENGTH_SHORT).show();
-                Log.e(Constants.TAG, "ToqApiDemo.onStart - error connecting to Toq app service", e);
+
             }
             
         } else {
-            Log.d(Constants.TAG, "ToqApiDemo.onStart - already connected");
             setStatus(getString(R.string.status_connected));
             refreshUI();
         }
@@ -108,8 +102,6 @@ public class ToqActivity extends Activity {
 
     public void onStop() {  
         super.onStop();
-
-        Log.d(Constants.TAG, "ToqApiDemo.onStop");
 
         unregisterStateReceiver();
         
@@ -121,8 +113,6 @@ public class ToqActivity extends Activity {
     
     public void onDestroy() {  
         super.onDestroy();
-        
-        Log.d(Constants.TAG, "ToqApiDemo.onDestroy");
 
         deckOfCardsManager.disconnect();
     }
@@ -229,16 +219,13 @@ public class ToqActivity extends Activity {
         
     // Toq app state receiver
     private class ToqAppletInstallBroadcastReciever extends BroadcastReceiver {
-
         public void onReceive(Context context, Intent intent) {
-            String action= intent.getAction();
+            String action = intent.getAction();
 
             if (action == null) {
                 Log.w(Constants.TAG, "ToqApiDemo.ToqAppStateBroadcastReceiver.onReceive - action is null, returning");
                 return;
             }
-            
-            Log.d(Constants.TAG, "ToqApiDemo.ToqAppStateBroadcastReceiver.onReceive - action: " + action);            
             
             // If watch is now connected, refresh UI
             if (action.equals(Constants.TOQ_WATCH_CONNECTED_INTENT)) { 
@@ -248,108 +235,96 @@ public class ToqActivity extends Activity {
             } else if (action.equals(Constants.TOQ_WATCH_DISCONNECTED_INTENT)) { 
                 Toast.makeText(ToqActivity.this, getString(R.string.intent_toq_watch_disconnected), Toast.LENGTH_SHORT).show();
                 disableUI();
-            }
-            
+            }    
         }
-
     }
     
     
     /*
      * Private API
      */
-    // Connected to Toq app service, so refresh the UI
     private void refreshUI() {
-
         try { 
-            // If Toq watch is connected
             if (deckOfCardsManager.isToqWatchConnected()) {
-
-                // If the deck of cards applet is already installed
                 if (deckOfCardsManager.isInstalled()) {
-                    Log.d(Constants.TAG, "ToqApiDemo.refreshUI - already installed");
                     updateUIInstalled();
                     
                 } else {
-                    Log.d(Constants.TAG, "ToqApiDemo.refreshUI - not installed"); 
                     updateUINotInstalled();
                 }
                 
             } else {
-                Log.d(Constants.TAG, "ToqApiDemo.refreshUI - Toq watch is disconnected");
                 Toast.makeText(ToqActivity.this, getString(R.string.intent_toq_watch_disconnected), Toast.LENGTH_SHORT).show();
                 disableUI();
             }
 
         } catch (RemoteDeckOfCardsException e) {
             Toast.makeText(this, getString(R.string.error_checking_status), Toast.LENGTH_SHORT).show();
-            Log.e(Constants.TAG, "ToqApiDemo.refreshUI - error checking if Toq watch is connected or deck of cards is installed", e);
         }
         
     }
     
     
-    // Disable all UI components
-    private void disableUI() {       
-        // Disable everything
-        //setChildrenEnabled(deckOfCardsPanel, false); 
-        //setChildrenEnabled(notificationPanel, false);
+    private void disableUI() {
+    	installDeckOfCardsButton.setEnabled(false);
+        updateDeckOfCardsButton.setEnabled(false);
+        uninstallDeckOfCardsButton.setEnabled(false);
+        sendNotificationButton.setEnabled(false);
+        
+        setStatus(getString(R.string.status_disconnected));
     }
     
     
-    // Set up UI for when deck of cards applet is already installed
     private void updateUIInstalled() {
-        // Enable everything
-        //setChildrenEnabled(deckOfCardsPanel, true);
-        //setChildrenEnabled(notificationPanel, true);
-        
-        // Install disabled; update, uninstall enabled
         installDeckOfCardsButton.setEnabled(false);
         updateDeckOfCardsButton.setEnabled(true);
         uninstallDeckOfCardsButton.setEnabled(true); 
-        
-        // Focus
+        sendNotificationButton.setEnabled(true);
+
         updateDeckOfCardsButton.requestFocus();
+        
+        setStatus(getString(R.string.status_connected));
     }
     
     
-    // Set up UI for when deck of cards applet is not installed
     private void updateUINotInstalled() {        
-        // Install enabled; update, uninstall disabled
         installDeckOfCardsButton.setEnabled(true);
         updateDeckOfCardsButton.setEnabled(false);
         uninstallDeckOfCardsButton.setEnabled(false);
-        // Focus
+        sendNotificationButton.setEnabled(false);
+
         installDeckOfCardsButton.requestFocus();
+        
+        setStatus(getString(R.string.status_disconnected));
     }
     
     
     // Register state receiver
     private void registerToqAppStateReceiver() {
         IntentFilter intentFilter = new IntentFilter();
+        
         intentFilter.addAction(Constants.BLUETOOTH_ENABLED_INTENT);
         intentFilter.addAction(Constants.BLUETOOTH_DISABLED_INTENT);
         intentFilter.addAction(Constants.TOQ_WATCH_PAIRED_INTENT);
         intentFilter.addAction(Constants.TOQ_WATCH_UNPAIRED_INTENT);
         intentFilter.addAction(Constants.TOQ_WATCH_CONNECTED_INTENT);
         intentFilter.addAction(Constants.TOQ_WATCH_DISCONNECTED_INTENT);
+        
         getApplicationContext().registerReceiver(toqAppStateReceiver, intentFilter);
     }
     
     
-    // Unregister state receiver 
     private void unregisterStateReceiver() {
         getApplicationContext().unregisterReceiver(toqAppStateReceiver);
     }
     
     
-    // Set status bar message
     private void setStatus(String msg) {
         statusTextView.setText(msg);
     }
     
     
-    // Initialise deck of cards
+    // Init deck of cards
     private void initDeckOfCards() {    
         try {                   
           deckOfCards = createDeckOfCards();
@@ -398,7 +373,7 @@ public class ToqActivity extends Activity {
         
         try {
         	Assets assets = new Assets(ToqActivity.this);
-			assets.makeCardList(listCard);
+			assets.makeCardList(listCard, false);
 			
 		} catch (JSONException e) {}
 
@@ -409,28 +384,28 @@ public class ToqActivity extends Activity {
     // Initialise the UI
     private void initUI() {
         // Buttons
-        installDeckOfCardsButton = (Button)findViewById(R.id.doc_install_button);
+        installDeckOfCardsButton = (Button) findViewById(R.id.doc_install_button);
         installDeckOfCardsButton.setOnClickListener(new OnClickListener() {
             public void onClick(View v){            
                 installDeckOfCards();
             }
         });
         
-        updateDeckOfCardsButton = (Button)findViewById(R.id.doc_update_button);
+        updateDeckOfCardsButton = (Button) findViewById(R.id.doc_update_button);
         updateDeckOfCardsButton.setOnClickListener(new OnClickListener() {
             public void onClick(View v){            
                 updateDeckOfCards();
             }
         });
         
-        uninstallDeckOfCardsButton= (Button)findViewById(R.id.doc_uninstall_button);
+        uninstallDeckOfCardsButton = (Button) findViewById(R.id.doc_uninstall_button);
         uninstallDeckOfCardsButton.setOnClickListener(new OnClickListener() {
             public void onClick(View v){            
                 uninstallDeckOfCards();
             }
         });
         
-        sendNotificationButton= (Button)findViewById(R.id.send_notification_button);
+        sendNotificationButton = (Button) findViewById(R.id.send_notification_button);
         sendNotificationButton.setOnClickListener(new OnClickListener() {
             public void onClick(View v){            
                 sendNotification();
@@ -443,7 +418,7 @@ public class ToqActivity extends Activity {
         
         try {
         	Assets assets = new Assets(ToqActivity.this);
-			assets.makeCardList(listCard);
+			assets.makeCardList(listCard, false);
 			
 		} catch (JSONException e) {}
 
@@ -455,15 +430,12 @@ public class ToqActivity extends Activity {
     
     // Install deck of cards applet
     private void installDeckOfCards(){
-        
-        Log.d(Constants.TAG, "ToqApiDemo.installDeckOfCards");
-        
         updateDeckOfCardsFromUI();
         
         try{                      
             deckOfCardsManager.installDeckOfCards(deckOfCards, resourceStore);
-        }
-        catch (RemoteDeckOfCardsException e){
+            
+        } catch (RemoteDeckOfCardsException e) {
             Toast.makeText(this, getString(R.string.error_installing_deck_of_cards), Toast.LENGTH_SHORT).show();
             Log.e(Constants.TAG, "ToqApiDemo.installDeckOfCards - error installing deck of cards applet", e);
         }
@@ -479,9 +451,7 @@ public class ToqActivity extends Activity {
     
     
     // Update deck of cards applet
-    private void updateDeckOfCards() {
-        Log.d(Constants.TAG, "ToqApiDemo.updateDeckOfCards");
-        
+    private void updateDeckOfCards() {        
         updateDeckOfCardsFromUI();
         
         try {            
@@ -504,9 +474,6 @@ public class ToqActivity extends Activity {
     
     // Uninstall deck of cards applet
     private void uninstallDeckOfCards() {
-        
-        Log.d(Constants.TAG, "ToqApiDemo.uninstallDeckOfCards");
-        
         try {                        
             deckOfCardsManager.uninstallDeckOfCards();
             
@@ -514,7 +481,6 @@ public class ToqActivity extends Activity {
             Toast.makeText(this, getString(R.string.error_uninstalling_deck_of_cards), Toast.LENGTH_SHORT).show();
             Log.e(Constants.TAG, "ToqApiDemo.uninstallDeckOfCards - error uninstalling deck of cards applet applet", e);
         }
-
     }
     
     
@@ -549,7 +515,7 @@ public class ToqActivity extends Activity {
     private Bitmap getIcon(String fileName) throws Exception {
 
         try {
-            InputStream is= getAssets().open(fileName);
+            InputStream is = getAssets().open(fileName);
             return BitmapFactory.decodeStream(is);
             
         } catch (Exception e) {
@@ -565,7 +531,7 @@ public class ToqActivity extends Activity {
         
         try {
         	Assets assets = new Assets(ToqActivity.this);
-			assets.makeCardList(listCard);
+			assets.makeCardList(listCard, true);
 			
 		} catch (JSONException e) {}
     }

@@ -38,7 +38,7 @@ public class Assets {
 		Assets.context = context;
 	}
 	
-	public void makeCardList(final ListCard listCard) throws JSONException {
+	public void makeCardList(final ListCard listCard, final Boolean update) throws JSONException {
 		SbcAPI.get(null, null, new JsonHttpResponseHandler() {
 			@Override
 			public void onSuccess(JSONObject json) {
@@ -55,13 +55,19 @@ public class Assets {
 						   		JSONObject asset     = assetItem.getJSONObject("asset");
 						   		String name          = asset.getString("name");
 						   		int number           = i + 1;
-	   		
-						   		SimpleTextCard simpleTextCard = new SimpleTextCard("asset"+ number, "Asset "+ number, System.currentTimeMillis(), name, null);
-						        simpleTextCard .setInfoText("10");
-						        simpleTextCard.setReceivingEvents(true);
-						        //simpleTextCard.setMenuOptions(new String[]{"aaa", "bbb", "ccc"});
-						        simpleTextCard.setShowDivider(false);
-						        listCard.add(simpleTextCard);
+						   		
+						   		SimpleTextCard assetCard = null;
+						   		
+						   		if (update == true) {
+						   			assetCard = (SimpleTextCard) listCard.childAtIndex(i);
+						   			Log.e("update", assetCard.toString());
+						   		} else {
+						   			assetCard = new SimpleTextCard("asset"+ number, "Asset "+ number, System.currentTimeMillis(), name, null);
+						   		}
+						   		assetCard.setReceivingEvents(true);
+						        //assetCard.setMenuOptions(new String[]{"aaa", "bbb", "ccc"});
+						   		assetCard.setShowDivider(false);
+						        listCard.add(assetCard);
 						  	}
 						}
 					}
