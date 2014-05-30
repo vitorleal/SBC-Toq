@@ -34,14 +34,14 @@
         </activity>
         
         <activity
-            android:name="com.vleal.sbc.ToqActivity"
+            android:name="com.vleal.sbc.toq.ToqActivity"
             android:label="@string/app_name"
             android:screenOrientation="portrait"
             android:parentActivityName="com.vleal.sbc.MainActivity" >
         </activity>
         
         <receiver 
-            android:name="com.vleal.sbc.ToqAppletInstallBroadcastReciever"
+            android:name="com.vleal.sbc.toq.ToqAppletInstallBroadcastReciever"
             android:enabled="true"
             android:exported="true">            
             <intent-filter>

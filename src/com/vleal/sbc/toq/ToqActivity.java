@@ -1,4 +1,4 @@
-package com.vleal.sbc;
+package com.vleal.sbc.toq;
 
 import java.io.InputStream;
 
@@ -55,6 +55,7 @@ public class ToqActivity extends Activity {
     
     private Button sendNotificationButton;
     private TextView statusTextView;
+    
     
 	//On Create the activity
 	public void onCreate(Bundle icicle) { 
@@ -175,10 +176,12 @@ public class ToqActivity extends Activity {
     
     // Handle card events triggered by the user interacting with a card in the installed deck of cards
     private class DeckOfCardsEventListenerImpl implements DeckOfCardsEventListener {
-
         public void onCardOpen(final String cardId) {
             runOnUiThread(new Runnable() {
                 public void run() {
+                	//ListCard listCard   = deckOfCards.getListCard();
+                	//SimpleTextCard card = (SimpleTextCard) listCard.get(cardId);
+                	
                     Toast.makeText(ToqActivity.this, getString(R.string.event_card_open) + cardId, Toast.LENGTH_SHORT).show();               
                 }
             });
@@ -222,6 +225,8 @@ public class ToqActivity extends Activity {
     private class ToqAppletInstallBroadcastReciever extends BroadcastReceiver {
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
+            
+            Log.e("action", action);
 
             if (action == null) {
                 Log.w(Constants.TAG, "ToqApiDemo.ToqAppStateBroadcastReceiver.onReceive - action is null, returning");

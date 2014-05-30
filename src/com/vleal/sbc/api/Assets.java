@@ -1,6 +1,7 @@
 package com.vleal.sbc.api;
 
 import java.util.ArrayList;
+import java.util.concurrent.Callable;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -38,6 +39,7 @@ public class Assets {
 		Assets.context = context;
 	}
 	
+	//Make card list
 	public void makeCardList(final ListCard listCard, final Boolean update) throws JSONException {
 		SbcAPI.get(null, null, new JsonHttpResponseHandler() {
 			@Override
@@ -48,34 +50,60 @@ public class Assets {
 						
 						if (assetsList != null && assetsList.length() > 0) {
 							for(int i = 0; i < assetsList.length(); i++) {
-								Log.e("Assets", "card" + i);
 								
-								JSONObject assetItem = assetsList.getJSONObject(i);
-						   		JSONObject asset     = assetItem.getJSONObject("asset");
-						   		String name          = asset.getString("name");
-						   		int number           = i + 1;
+								JSONObject assetItem    = assetsList.getJSONObject(i);
+						   		JSONObject asset        = assetItem.getJSONObject("asset");
 						   		
-						   		SimpleTextCard assetCard = new SimpleTextCard("asset"+ number, "Asset "+ number, System.currentTimeMillis(), name, null);
+						   		String name             = asset.getString("name");
+						   		String status           = assetItem.getString("status");
+						   		int number              = i + 1;
+						   		ArrayList<String> sData = new ArrayList<String>();
+						   		
+						   		
+						   		if (assetItem.has("sensorData")) {
+						   			JSONArray sensors  = assetItem.getJSONArray("sensorData");
+						   			
+									for(int j = 0; j < sensors.length(); j++) {
+										JSONObject sensorItem = sensors.getJSONObject(j);
+								   		JSONObject sensor     = sensorItem.getJSONObject("ms");
+								   		Object v              = sensor.opt("v");
+								   		String p              = sensor.getString("p");
+								   		String u              = sensor.getString("u");
+								   		
+								   		Log.e("sensor", v.toString());
+								   		sData.add(p + ": " + v +" " + u.toString());
+								  	}
+								}
+						   		
+						   		SimpleTextCard assetCard = new SimpleTextCard("asset"+ number, status, System.currentTimeMillis(), name, null);
+						   		if (sData.size() > 0) {
+						   			assetCard.setMessageText(sData.toArray(new String[sData.size()]));
+						   			
+						   		} else {
+						   			assetCard.setMessageText(new String[] { "Sem dados na SBC" });
+						   		}
 						   		assetCard.setReceivingEvents(true);
-						   		assetCard.setShowDivider(false);
+						   		assetCard.setShowDivider(true);
 						        listCard.add(assetCard);
+						        Log.e("card added", assetCard.toString());
 						  	}
 						}
 					}
 					
-				} catch (Exception e) {} 	
+				} catch (Exception e) {
+					Log.e("error", e.toString());
+				} 	
 			}
 		});
 	}
 	
-	//Get asset list
+	//Make asset list
 	public void makeList(final ListView list, final ProgressBar loader) throws JSONException {
 		SbcAPI.get(null, null, new JsonHttpResponseHandler() {
 			
 			@Override
 			public void onSuccess(JSONObject json) {
 				loader.setVisibility(View.GONE);
-				list.setVisibility(View.VISIBLE);
 				
 				try {
 					if (json.has("data")) {
@@ -104,11 +132,13 @@ public class Assets {
 				                    
 									String asset = (String) list.getItemAtPosition(position);
 									
-									try {
-										Assets one = new Assets(getContext());
-										one.makeAsset(asset);
+									Intent intent = new Intent(getContext(), AssetActivity.class);
 										
-									} catch (JSONException e) {}
+									Bundle bundle = new Bundle();
+									bundle.putString("name", asset);
+										
+									intent.putExtras(bundle);
+									getContext().startActivity(intent);
 								}
 				            }); 
 						}
@@ -123,19 +153,64 @@ public class Assets {
 		});
 	}
 	
-	//Get asset
-	public void makeAsset(final String asset) throws JSONException {
+	
+	
+	
+	//Make asset item
+	public void makeItem(final String asset, final ListView list, final ProgressBar loader) throws JSONException {
+		loader.setVisibility(View.GONE);
+		
 		SbcAPI.get(asset, null, new JsonHttpResponseHandler() {
 			@Override
 			public void onSuccess(JSONObject json) {
-				Intent intent = new Intent(getContext(), AssetActivity.class);
-				
-				Bundle bundle = new Bundle();
-				bundle.putString("name", asset);
-				bundle.putString("json", json.toString());
-				
-				intent.putExtras(bundle);
-				getContext().startActivity(intent);
+				try {
+					JSONObject data = json.getJSONObject("data");
+					
+					ArrayList<String> assets = null;
+					
+					if (data.has("sensorData")) {
+			   			JSONArray sensors  = data.getJSONArray("sensorData");
+						assets = new ArrayList<String>();
+						
+						for(int i = 0; i < sensors.length(); i++) {
+							JSONObject assetItem = sensors.getJSONObject(i);
+					   		JSONObject asset     = assetItem.getJSONObject("ms");
+					   		Object v             = asset.opt("v");
+					   		String p             = asset.getString("p");
+					   		String u             = asset.getString("u");
+					   		
+					   		assets.add(p + ": " + v +" " + u.toString());
+					  	}
+						
+					} else {
+						assets = new ArrayList<String>();
+						assets.add(getContext().getString(R.string.no_asset_data));
+					}
+					
+					ArrayAdapter<String> adapter = new ArrayAdapter<String>(getContext(), 
+							R.layout.sensor_list_item, R.id.sensorName, assets);
+					
+					list.setAdapter(adapter);
+
+				} catch (JSONException e) {}
+			}
+
+			@Override
+			public void onFailure(Throwable e, JSONObject errorResponse) {
+				Log.e("Assets get one Failure", e.toString());
+			}
+		});
+	}
+	
+	//Make asset item
+	public void makeCardItem(final SimpleTextCard card) throws JSONException {
+		String asset = card.getTitleText();
+		
+		SbcAPI.get(asset, null, new JsonHttpResponseHandler() {
+			@Override
+			public void onSuccess(JSONObject json) {
+				Log.e("josn", json.toString());
+		        card.setTimeMillis(System.currentTimeMillis());
 			}
 
 			@Override

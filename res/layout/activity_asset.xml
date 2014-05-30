@@ -15,7 +15,6 @@
         android:layout_height="match_parent"
         android:layout_below="@+id/deviceListTitle"
         android:layout_centerHorizontal="true" >
-
     </ListView>
     
     <TextView
@@ -33,5 +32,13 @@
         android:text="@string/sensor_list"
         android:textAppearance="@style/AppBaseTheme"
         android:textSize="30sp" />
+
+    <ProgressBar
+        android:id="@+id/loader_sensor"
+        style="?android:attr/progressBarStyleLarge"
+        android:layout_width="wrap_content"
+        android:layout_height="fill_parent"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true" />
 
 </RelativeLayout>

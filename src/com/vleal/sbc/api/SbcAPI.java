@@ -1,31 +1,38 @@
 package com.vleal.sbc.api;
 
+import android.util.Log;
+
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
 
 public class SbcAPI {
-	private static final String SERVICE  = "brasilTest";
-	private static final String BASE_URL = "http://195.235.93.67:8080/m2m/v2/services/"+ SERVICE +"/assets/";
-	private static final Integer TIMEOUT = 30000;
+	private static final String API_URL     = "http://195.235.93.67:8080/m2m/v2";
+	private static final String SERVICE     = "brasilTest";
+	private static final String SERVICE_URL = API_URL + "/services/"+ SERVICE +"/devices?extended=1";
+	private static final String ASSET_URL   = API_URL + "/services/"+ SERVICE +"/assets/";
+	private static final Integer TIMEOUT    = 30000;
+	private static AsyncHttpClient client   = new AsyncHttpClient();
 
-	private static AsyncHttpClient client = new AsyncHttpClient();
-
+	
 	public static void get(String asset, RequestParams params, AsyncHttpResponseHandler responseHandler) {
 		final String URL;
 		
 		client.setTimeout(TIMEOUT);
 		
 		if (asset == null) {
-			URL = BASE_URL;
+			URL = SERVICE_URL;
+			
 		} else {
 			URL = getAssetUrl(asset);
 		}
+		
+		Log.e("url", URL);
 		
 		client.get(URL, params, responseHandler);
 	}
 
 	private static String getAssetUrl(String asset) {
-		return BASE_URL + asset;
+		return ASSET_URL + asset;
 	}
 }
