@@ -34,8 +34,7 @@ public class ToqUpdateService extends Service {
 		public void run() {
 			Log.e("service", "--------- UPDATE --------");
 			ToqActivity.updateDeckOfCards(getApplicationContext());
-			handler.postDelayed(this, 300000);
+			handler.postDelayed(this, 60000);
 	    }
 	};
-
 }

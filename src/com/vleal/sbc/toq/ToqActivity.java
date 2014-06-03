@@ -381,7 +381,7 @@ public class ToqActivity extends Activity {
         
         try {
         	Assets assets = new Assets(ToqActivity.this);
-			assets.makeCardList(listCard, false);
+			assets.makeCardList(listCard);
 			
 		} catch (JSONException e) {}
 
@@ -426,7 +426,7 @@ public class ToqActivity extends Activity {
         
         try {
         	Assets assets = new Assets(ToqActivity.this);
-			assets.makeCardList(listCard, false);
+			assets.makeCardList(listCard);
 			
 		} catch (JSONException e) {}
 
@@ -538,7 +538,7 @@ public class ToqActivity extends Activity {
         
         try {
         	Assets assets = new Assets(context);
-			assets.updateCardList(listCard, true);
+			assets.makeCardList(listCard);
 			
 		} catch (JSONException e) {}
     }

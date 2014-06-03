@@ -39,7 +39,7 @@ public class Assets {
 	}
 	
 	//Make card list
-	public void makeCardList(final ListCard listCard, final Boolean update) throws JSONException {
+	public void makeCardList(final ListCard listCard) throws JSONException {
 		SbcAPI.get(null, null, new JsonHttpResponseHandler() {
 			@Override
 			public void onSuccess(JSONObject json) {
@@ -69,89 +69,45 @@ public class Assets {
 								   		String p              = sensor.getString("p");
 								   		String u              = sensor.getString("u");
 								   		
-								   		Log.e("sensor", v.toString());
 								   		sData.add(p + ": " + v +" " + u.toString());
 								  	}
 								}
 						   		
-						   		SimpleTextCard assetCard = new SimpleTextCard("asset"+ number, status, System.currentTimeMillis(), name, null);
+						   		SimpleTextCard c         = null;
+						   		SimpleTextCard assetCard = null;
+						   		
+						   		try {
+						   			c = (SimpleTextCard) listCard.get("asset" + number);
+							   		Log.e("my card", c.toString());
+							   		
+						   		} catch (Exception e) {}
+						   		
+						   		if (c != null) {
+						   			assetCard = (SimpleTextCard) listCard.childAtIndex(i);
+						   			
+						   		} else {
+						   			assetCard = new SimpleTextCard("asset"+ number, status, System.currentTimeMillis(), name, null);
+						   		}
+
 						   		if (sData.size() > 0) {
 						   			assetCard.setMessageText(sData.toArray(new String[sData.size()]));
 						   			
 						   		} else {
 						   			assetCard.setMessageText(new String[] { "Sem dados na SBC" });
 						   		}
+						   		
 						   		assetCard.setReceivingEvents(true);
 						   		assetCard.setShowDivider(true);
-						        listCard.add(assetCard);
-						        Log.e("card added", assetCard.toString());
-						  	}
-						}
-					}
-					
-				} catch (Exception e) {
-					Log.e("error", e.toString());
-				} 	
-			}
-		});
-	}
-	
-	//Make card list
-	public void updateCardList(final ListCard listCard, final Boolean update) throws JSONException {
-		SbcAPI.get(null, null, new JsonHttpResponseHandler() {
-			@Override
-			public void onSuccess(JSONObject json) {
-				try {
-					if (json.has("data")) {
-						JSONArray assetsList = (JSONArray) json.get("data");
-						
-						if (assetsList != null && assetsList.length() > 0) {
-							for(int i = 0; i < assetsList.length(); i++) {
-								
-								JSONObject assetItem    = assetsList.getJSONObject(i);
-						   		JSONObject asset        = assetItem.getJSONObject("asset");
 						   		
-						   		String name             = asset.getString("name");
-						   		String status           = assetItem.getString("status");
-
-						   		ArrayList<String> sData = new ArrayList<String>();
-						   		
-						   		
-						   		if (assetItem.has("sensorData")) {
-						   			JSONArray sensors  = assetItem.getJSONArray("sensorData");
-						   			
-									for(int j = 0; j < sensors.length(); j++) {
-										JSONObject sensorItem = sensors.getJSONObject(j);
-								   		JSONObject sensor     = sensorItem.getJSONObject("ms");
-								   		Object v              = sensor.opt("v");
-								   		String p              = sensor.getString("p");
-								   		String u              = sensor.getString("u");
-								   		
-								   		Log.e("sensor", v.toString());
-								   		sData.add(p + ": " + v +" " + u.toString());
-								  	}
-								}
-						   		
-						   		SimpleTextCard assetCard = (SimpleTextCard) listCard.childAtIndex(i);
-
-						   		assetCard.setHeaderText(status);
-						   		assetCard.setTitleText(name);
-						   		assetCard.setTimeMillis(System.currentTimeMillis());
-						   		
-						   		if (sData.size() > 0) {
-						   			assetCard.setMessageText(sData.toArray(new String[sData.size()]));
-						   			
-						   		} else {
-						   			assetCard.setMessageText(new String[] { "Sem dados na SBC" });
+						   		if (c == null) {
+						   			listCard.add(assetCard);
 						   		}
-						   		assetCard.setReceivingEvents(true);
-						   		assetCard.setShowDivider(true);
 						  	}
 						}
 					}
 					
 				} catch (Exception e) {
-					Log.e("error", e.toString());
+					Log.e("error make card", e.toString());
 				} 	
 			}
 		});
