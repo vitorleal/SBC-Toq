@@ -1,7 +1,5 @@
 package com.vleal.sbc.api;
 
-import android.util.Log;
-
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
@@ -26,8 +24,6 @@ public class SbcAPI {
 		} else {
 			URL = getAssetUrl(asset);
 		}
-		
-		Log.e("url", URL);
 		
 		client.get(URL, params, responseHandler);
 	}
