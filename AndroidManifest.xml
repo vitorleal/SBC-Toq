@@ -40,6 +40,10 @@
             android:parentActivityName="com.vleal.sbc.MainActivity" >
         </activity>
         
+        <service
+            android:enabled="true" android:name="com.vleal.sbc.toq.ToqUpdateService">  
+        </service>
+        
         <receiver 
             android:name="com.vleal.sbc.toq.ToqAppletInstallBroadcastReciever"
             android:enabled="true"

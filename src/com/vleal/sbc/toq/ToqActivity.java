@@ -47,7 +47,7 @@ public class ToqActivity extends Activity {
     
     private ToqAppletInstallBroadcastReciever toqAppStateReceiver;
     private RemoteResourceStore resourceStore;   
-    private RemoteDeckOfCards deckOfCards;
+    private static RemoteDeckOfCards deckOfCards;
 
     private Button installDeckOfCardsButton;
     private Button updateDeckOfCardsButton;
@@ -70,6 +70,8 @@ public class ToqActivity extends Activity {
         
         initDeckOfCards();
         initUI();
+        
+        startService(new Intent(this, ToqUpdateService.class));
     }
     
 
@@ -436,7 +438,7 @@ public class ToqActivity extends Activity {
     
     // Install deck of cards applet
     private void installDeckOfCards(){
-        updateDeckOfCardsFromUI();
+        updateDeckOfCardsFromUI(getApplicationContext());
         
         try{                      
             deckOfCardsManager.installDeckOfCards(deckOfCards, resourceStore);
@@ -458,7 +460,7 @@ public class ToqActivity extends Activity {
     
     // Update deck of cards applet
     private void updateDeckOfCards() {        
-        updateDeckOfCardsFromUI();
+        updateDeckOfCardsFromUI(getApplicationContext());
         
         try {            
             deckOfCardsManager.updateDeckOfCards(deckOfCards, resourceStore);
@@ -532,12 +534,12 @@ public class ToqActivity extends Activity {
     
     
     // Parse the UI to update the deck of cards contents
-    private void updateDeckOfCardsFromUI() {
+    public static void updateDeckOfCardsFromUI(Context context) {
         ListCard listCard = deckOfCards.getListCard();
         
         try {
-        	Assets assets = new Assets(ToqActivity.this);
-			assets.makeCardList(listCard, true);
+        	Assets assets = new Assets(context);
+			assets.updateCardList(listCard, true);
 			
 		} catch (JSONException e) {}
     }
