@@ -33,7 +33,7 @@ public class ToqUpdateService extends Service {
 	private Runnable updateCards = new Runnable() {
 		public void run() {
 			Log.e("service", "--------- UPDATE --------");
-			ToqActivity.updateDeckOfCardsFromUI(getApplicationContext());
+			ToqActivity.updateDeckOfCards(getApplicationContext());
 			handler.postDelayed(this, 300000);
 	    }
 	};

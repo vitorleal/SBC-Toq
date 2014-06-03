@@ -40,13 +40,13 @@ public class ToqActivity extends Activity {
     private final static String DECK_OF_CARDS_KEY         = "deck_of_cards_key";
     private final static String DECK_OF_CARDS_VERSION_KEY = "deck_of_cards_version_key";
     
-    private DeckOfCardsManager deckOfCardsManager;
+    private static DeckOfCardsManager deckOfCardsManager;
         
     private DeckOfCardsManagerListener deckOfCardsManagerListener;
     private DeckOfCardsEventListener deckOfCardsEventListener;
     
     private ToqAppletInstallBroadcastReciever toqAppStateReceiver;
-    private RemoteResourceStore resourceStore;   
+    private static RemoteResourceStore resourceStore;   
     private static RemoteDeckOfCards deckOfCards;
 
     private Button installDeckOfCardsButton;
@@ -336,7 +336,7 @@ public class ToqActivity extends Activity {
     private void initDeckOfCards() {    
         try {                   
           deckOfCards = createDeckOfCards();
-          storeDeckOfCards();                
+          storeDeckOfCards(getApplicationContext());                
    
         } catch (Throwable th) {
             Log.w(Constants.TAG, "ToqApiDemo.initDeckOfCards - error occurred retrieving the stored deck of cards: " + th.getMessage());
@@ -365,8 +365,8 @@ public class ToqActivity extends Activity {
     }
     
     // Store deck of cards
-    private void storeDeckOfCards() throws Exception {        
-        SharedPreferences prefs = getSharedPreferences(SBC_PREFS_FILE, Context.MODE_PRIVATE);
+    private static void storeDeckOfCards(Context context) throws Exception {        
+        SharedPreferences prefs = context.getSharedPreferences(SBC_PREFS_FILE, Context.MODE_PRIVATE);
         Editor editor           = prefs.edit();
         
         editor.putString(DECK_OF_CARDS_KEY, ParcelableUtil.marshall(deckOfCards));
@@ -402,7 +402,7 @@ public class ToqActivity extends Activity {
         updateDeckOfCardsButton = (Button) findViewById(R.id.doc_update_button);
         updateDeckOfCardsButton.setOnClickListener(new OnClickListener() {
             public void onClick(View v){            
-                updateDeckOfCards();
+                updateDeckOfCards(getApplicationContext());
             }
         });
         
@@ -449,7 +449,7 @@ public class ToqActivity extends Activity {
         }
         
         try{
-            storeDeckOfCards();
+            storeDeckOfCards(getApplicationContext());
             
         } catch (Exception e){
             Log.e(Constants.TAG, "ToqApiDemo.installDeckOfCards - error storing deck of cards applet", e);
@@ -459,19 +459,18 @@ public class ToqActivity extends Activity {
     
     
     // Update deck of cards applet
-    private void updateDeckOfCards() {        
-        updateDeckOfCardsFromUI(getApplicationContext());
+    public static void updateDeckOfCards(Context context) {        
+        updateDeckOfCardsFromUI(context);
         
         try {            
             deckOfCardsManager.updateDeckOfCards(deckOfCards, resourceStore);
             
         } catch (RemoteDeckOfCardsException e) {
-            Toast.makeText(this, getString(R.string.error_updating_deck_of_cards), Toast.LENGTH_SHORT).show();
             Log.e(Constants.TAG, "ToqApiDemo.updateDeckOfCards - error updating deck of cards applet", e);
         }
         
         try {
-            storeDeckOfCards();
+            storeDeckOfCards(context);
             
         } catch (Exception e) {
             Log.e(Constants.TAG, "ToqApiDemo.updateDeckOfCards - error storing deck of cards applet", e);
